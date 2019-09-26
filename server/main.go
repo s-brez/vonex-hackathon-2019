@@ -1,16 +1,16 @@
 package main
 
 import (
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/gorilla/mux"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
-	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var client *mongo.Client
@@ -26,9 +26,10 @@ type Item struct {
 // User object
 type User struct {
 	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Email	  string             `json:"email,omitempty" bson:"email,omitempty"`
 	Firstname string             `json:"firstname,omitempty" bson:"firstname,omitempty"`
 	Lastname  string             `json:"lastname,omitempty" bson:"lastname,omitempty"`
-	Password  string             `json:"password,omitempty" bson:"lastname,omitempty"`
+	Password  string             `json:"password,omitempty" bson:"password,omitempty"`
 }
 
 // TBC. Maybe get all purchases for a user.
@@ -51,15 +52,18 @@ func CreateUserEndpoint(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
 	var user User
 	_ = json.NewDecoder(request.Body).Decode(&user)
+	fmt.Println(user)	// remove in production
 	collection := client.Database("hackathon_app").Collection("users")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	result, _ := collection.InsertOne(ctx, user)
 	json.NewEncoder(response).Encode(result)
+	fmt.Println(result)  // remove in production
 }
 
-// Get all users
+// Returns a list of all users
 func GetUsersEndpoint(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
+	fmt.Println(response)	// remove in production
 	var users []User
 	collection := client.Database("hackathon_app").Collection("users")
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
@@ -83,15 +87,15 @@ func GetUsersEndpoint(response http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(response).Encode(users)
 }
 
-// Return user where id matches user[id]
+// Return user where email matches user[email]
 func GetUserEndpoint(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
 	params := mux.Vars(request)
-	id, _ := primitive.ObjectIDFromHex(params["id"])
+	id, _ := params["username"]
 	var user User
 	collection := client.Database("hackathon_app").Collection("users")
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	err := collection.FindOne(ctx, User{ID: id}).Decode(&user)
+	err := collection.FindOne(ctx, User{Email: id}).Decode(&user)
 	if err != nil {
 		response.WriteHeader(http.StatusInternalServerError)
 		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))

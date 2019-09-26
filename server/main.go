@@ -17,58 +17,63 @@ var client *mongo.Client
 
 // User object - use email field as the unique key
 type User struct {
-	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
-	Email	  	string             	`json:"email,omitempty" bson:"email,omitempty"`
-	Firstname 	string             	`json:"firstname,omitempty" bson:"firstname,omitempty"`
-	Lastname  	string             	`json:"lastname,omitempty" bson:"lastname,omitempty"`
-	Password  	string             	`json:"password,omitempty" bson:"password,omitempty"`
-	Picker	  	string             	`json:"picker,omitempty" bson:"picker,omitempty"`
-	Packer	  	string             	`json:"packer,omitempty" bson:"packer,omitempty"`
-	// SavedItems     			   	`json:"saved,omitempty" bson:"saved,omitempty"`
+	ID        	primitive.ObjectID 	`json:"_id" bson:"_id"`
+	Email	  	string             	`json:"email" bson:"email"`
+	Firstname 	string             	`json:"firstname" bson:"firstname"`
+	Lastname  	string             	`json:"lastname" bson:"lastname"`
+	Password  	string             	`json:"password" bson:"password"`
+	Picker	  	string             	`json:"picker" bson:"picker"`
+	Packer	  	string             	`json:"packer" bson:"packer"`
+	Fb			string 				`json:"fb" bson:"fb"`
+	Insta 		string 				`json:"insta" bson:"insta"`
+	
+	// Store the UID for saved items and listings as string[], retrieve using USD
+	Saveditems  []string        	`json:"saveditems" bson:"saveditems"`
+	Mylistings  []string        	`json:"mylistings" bson:"mylistings"`
 }
 
 // Item object - use name field as the unique key
 type Item struct {
-	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
-	UID			string 				`json:"uid,omitempty" bson:"uid,omitempty"`
-	Name 		string           	`json:"name,omitempty" bson:"name,omitempty"`
-	Description string          	`json:"description,omitempty" bson:"description,omitempty"`
-	Category	string           	`json:"category,omitempty" bson:"category,omitempty"`
+	ID        	primitive.ObjectID 	`json:"_id" bson:"_id"`
+	UID			string 				`json:"uid" bson:"uid"`
+	Name 		string           	`json:"name" bson:"name"`
+	Description string          	`json:"description" bson:"description"`
+	Category	string           	`json:"category" bson:"category"`
 }
 
 // Listing object - use listing ID (lid) as unique key
 type Listing struct {
-	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
-	LID		  	string 			 	`json:"LID,omitempty" bson:"LID,omitempty"`
-	Location 	string 			 	`json:"location,omitempty" bson:"location,omitempty"`
-	Active		string 				
+	ID        	primitive.ObjectID 	`json:"_id" bson:"_id"`
+	LID		  	string 			 	`json:"LID" bson:"LID"`
+	Location 	string 			 	`json:"location" bson:"location"`
+	Active		string 				`json:"active" bson:"active"`
+	Successful	string 				`json:"successful" bson:"successful"`
+	Item  		*Item 				`json:"item" bson:"item"`
 }
 
 // Message object - use message ID as unique key
 type Message struct {
-	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
-	Time		string 			 	`json:time",omitempty" bson:"time,omitempty"`
-	To		  	string 			 	`json:"to,omitempty" bson:"to,omitempty"`
-	From	  	string 			 	`json:"from,omitempty" bson:"from,omitempty"`
-	Text	  	string 			 	`json:"text,omitempty" bson:"text,omitempty"`	
+	ID        	primitive.ObjectID 	`json:"_id" bson:"_id"`
+	Time		string 			 	`json:time"" bson:"time"`
+	To		  	string 			 	`json:"to" bson:"to"`
+	From	  	string 			 	`json:"from" bson:"from"`
+	Text	  	string 			 	`json:"text" bson:"text"`	
 }
 
-// Search items by keyword
-func SearchItemsEndpoint(response http.ResponseWriter, request *http.Request) {}
 
-// Permanenty remove an item from database
+// Permanenty remove an item from database.
 func DeleteItemEndpoint(response http.ResponseWriter, request *http.Request) {}
 
-// Create a new Item 
+// Create a new Item.
 func CreateItemEndpoint(response http.ResponseWriter, request *http.Request) {}
 
-// Get all Items
+// Get all Items.
 func GetAllItemsEndpoint(response http.ResponseWriter, request *http.Request) {}
 
-// Get a single item by its uid
+// Get a single item by its uid.
 func GetItemEndpoint(response http.ResponseWriter, request *http.Request) {}
 
-// Delete a user
+// Delete a user account.
 func DeleteUserEndpoint(response http.ResponseWriter, request *http.Request) {}
 
 // Create a new user, write to db collection "users"

@@ -91,11 +91,13 @@ func GetUsersEndpoint(response http.ResponseWriter, request *http.Request) {
 func GetUserEndpoint(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
 	params := mux.Vars(request)
-	id, _ := params["username"]
+	email, _ := params["email"]
+	fmt.Println(params)	// remove in production
 	var user User
 	collection := client.Database("hackathon_app").Collection("users")
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	err := collection.FindOne(ctx, User{Email: id}).Decode(&user)
+	err := collection.FindOne(ctx, User{Email: email}).Decode(&user)
+	fmt.Println(User{Email: email})	// remove in production
 	if err != nil {
 		response.WriteHeader(http.StatusInternalServerError)
 		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
@@ -112,6 +114,6 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/user", CreateUserEndpoint).Methods("POST")
 	router.HandleFunc("/users", GetUsersEndpoint).Methods("GET")
-	router.HandleFunc("/user/{id}", GetUserEndpoint).Methods("GET")
+	router.HandleFunc("/user/{email}", GetUserEndpoint).Methods("GET")
 	http.ListenAndServe(":5005", router)
 }

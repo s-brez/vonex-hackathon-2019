@@ -8,6 +8,6 @@ data = 'agreen@gmail.com'
 
 headers = {'Content-type': 'application/json'}
 
-r = requests.get(url + "/" + data, data=json.dumps(data), headers=headers)
+r = requests.get(url + "/" + data,  headers=headers)
 
 print(r.text)

@@ -15,37 +15,61 @@ import (
 
 var client *mongo.Client
 
-// Item object
+// User object - use email field as the unique key
+type User struct {
+	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
+	Email	  	string             	`json:"email,omitempty" bson:"email,omitempty"`
+	Firstname 	string             	`json:"firstname,omitempty" bson:"firstname,omitempty"`
+	Lastname  	string             	`json:"lastname,omitempty" bson:"lastname,omitempty"`
+	Password  	string             	`json:"password,omitempty" bson:"password,omitempty"`
+	Picker	  	string             	`json:"picker,omitempty" bson:"picker,omitempty"`
+	Packer	  	string             	`json:"packer,omitempty" bson:"packer,omitempty"`
+	// SavedItems     			   	`json:"saved,omitempty" bson:"saved,omitempty"`
+}
+
+// Item object - use name field as the unique key
 type Item struct {
 	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
+	UID			string 				`json:"uid,omitempty" bson:"uid,omitempty"`
 	Name 		string           	`json:"name,omitempty" bson:"name,omitempty"`
 	Description string          	`json:"description,omitempty" bson:"description,omitempty"`
-	Stock 		string           	`json:"stock,omitempty" bson:"stock,omitempty"`
+	Category	string           	`json:"category,omitempty" bson:"category,omitempty"`
 }
 
-// User object
-type User struct {
-	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	Email	  string             `json:"email,omitempty" bson:"email,omitempty"`
-	Firstname string             `json:"firstname,omitempty" bson:"firstname,omitempty"`
-	Lastname  string             `json:"lastname,omitempty" bson:"lastname,omitempty"`
-	Password  string             `json:"password,omitempty" bson:"password,omitempty"`
+// Listing object - use listing ID (lid) as unique key
+type Listing struct {
+	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
+	LID		  	string 			 	`json:"LID,omitempty" bson:"LID,omitempty"`
+	Location 	string 			 	`json:"location,omitempty" bson:"location,omitempty"`
+	Active		string 				
 }
 
-// TBC. Maybe get all purchases for a user.
-func ExtraAPIEndpoint(response http.ResponseWriter, request *http.Request) {}
+// Message object - use message ID as unique key
+type Message struct {
+	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
+	Time		string 			 	`json:time",omitempty" bson:"time,omitempty"`
+	To		  	string 			 	`json:"to,omitempty" bson:"to,omitempty"`
+	From	  	string 			 	`json:"from,omitempty" bson:"from,omitempty"`
+	Text	  	string 			 	`json:"text,omitempty" bson:"text,omitempty"`	
+}
 
-// Get all inventory
-func GetAllInventoryEndpoint(response http.ResponseWriter, request *http.Request) {}
-
-// Return items that match search term
-func FindInventoryItemEndpoint(response http.ResponseWriter, request *http.Request) {}
+// Search items by keyword
+func SearchItemsEndpoint(response http.ResponseWriter, request *http.Request) {}
 
 // Permanenty remove an item from database
-func DeleteInventoryEndpoint(response http.ResponseWriter, request *http.Request) {}
+func DeleteItemEndpoint(response http.ResponseWriter, request *http.Request) {}
 
-// Increase or decrease inventory levels for given item
-func ModifyInventoryEndpoint(response http.ResponseWriter, request *http.Request) {}
+// Create a new Item 
+func CreateItemEndpoint(response http.ResponseWriter, request *http.Request) {}
+
+// Get all Items
+func GetAllItemsEndpoint(response http.ResponseWriter, request *http.Request) {}
+
+// Get a single item by its uid
+func GetItemEndpoint(response http.ResponseWriter, request *http.Request) {}
+
+// Delete a user
+func DeleteUserEndpoint(response http.ResponseWriter, request *http.Request) {}
 
 // Create a new user, write to db collection "users"
 func CreateUserEndpoint(response http.ResponseWriter, request *http.Request) {

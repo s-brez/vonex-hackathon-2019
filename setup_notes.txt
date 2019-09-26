@@ -1,0 +1,8 @@
+# assume installed git, go, mongodb installed
+# mongo needs a db called "hackathon_app" with collections "users" and "items"
+
+# run these commands from %project-root-dir%/server/ 
+# (where main.go is located) to install dependencies
+go get github.com/gorilla/mux
+go get go.mongodb.org/mongo-driver/mongo
+

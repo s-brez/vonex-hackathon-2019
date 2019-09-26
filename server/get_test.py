@@ -4,7 +4,7 @@ import json
 
 url = "http://localhost:5005/user"
 
-data = 'agreen@gmail.ckom'
+data = 'agreen@gmail.com'
 
 headers = {'Content-type': 'application/json'}
 

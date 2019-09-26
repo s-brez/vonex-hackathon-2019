@@ -17,25 +17,23 @@ var client *mongo.Client
 
 // User object - use email field as the unique key
 type User struct {
-	ID        	primitive.ObjectID 	`json:"_id" bson:"_id"`
-	Email	  	string             	`json:"email" bson:"email"`
-	Firstname 	string             	`json:"firstname" bson:"firstname"`
-	Lastname  	string             	`json:"lastname" bson:"lastname"`
-	Password  	string             	`json:"password" bson:"password"`
-	Picker	  	string             	`json:"picker" bson:"picker"`
-	Packer	  	string             	`json:"packer" bson:"packer"`
-	Fb			string 				`json:"fb" bson:"fb"`
-	Insta 		string 				`json:"insta" bson:"insta"`
-	
-	// Store the UID for saved items and listings as string[], retrieve using USD
-	Saveditems  []string        	`json:"saveditems" bson:"saveditems"`
-	Mylistings  []string        	`json:"mylistings" bson:"mylistings"`
+	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
+	Email	  	string             	`json:"email,omitempty" bson:"email,omitempty"`
+	Firstname 	string             	`json:"firstname,omitempty" bson:"firstname,omitempty"`
+	Lastname  	string             	`json:"lastname,omitempty" bson:"lastname,omitempty"`
+	Password  	string             	`json:"password,omitempty" bson:"password,omitempty"`
+	Picker	  	string             	`json:"picker,omitempty" bson:"picker,omitempty"`
+	Packer	  	string             	`json:"packer,omitempty" bson:"packer,omitempty"`
+	Fb			string 				`json:"fb,omitempty" bson:"fb,omitempty"`
+	Insta 		string 				`json:"insta,omitempty" bson:"insta,omitempty"`
+	Saveditems  []int       	 	`json:"saveditems,omitempty" bson:"saveditems,omitempty"`
+	Listings  	[]int        		`json:"listings,omitempty" bson:"listings,omitempty"`
 }
 
 // Item object - use name field as the unique key
 type Item struct {
 	ID        	primitive.ObjectID 	`json:"_id" bson:"_id"`
-	UID			string 				`json:"uid" bson:"uid"`
+	UID			int 				`json:"uid" bson:"uid"`
 	Name 		string           	`json:"name" bson:"name"`
 	Description string          	`json:"description" bson:"description"`
 	Category	string           	`json:"category" bson:"category"`
@@ -44,7 +42,7 @@ type Item struct {
 // Listing object - use listing ID (lid) as unique key
 type Listing struct {
 	ID        	primitive.ObjectID 	`json:"_id" bson:"_id"`
-	LID		  	string 			 	`json:"LID" bson:"LID"`
+	UID		  	int 			 	`json:"LID" bson:"LID"`
 	Location 	string 			 	`json:"location" bson:"location"`
 	Active		string 				`json:"active" bson:"active"`
 	Successful	string 				`json:"successful" bson:"successful"`
@@ -78,6 +76,7 @@ func DeleteUserEndpoint(response http.ResponseWriter, request *http.Request) {}
 
 // Create a new user, write to db collection "users"
 func CreateUserEndpoint(response http.ResponseWriter, request *http.Request) {
+	fmt.Println("Create user POST request received.")  // remove in production
 	response.Header().Set("content-type", "application/json")
 	var user User
 	_ = json.NewDecoder(request.Body).Decode(&user)
@@ -85,14 +84,16 @@ func CreateUserEndpoint(response http.ResponseWriter, request *http.Request) {
 	collection := client.Database("hackathon_app").Collection("users")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	result, _ := collection.InsertOne(ctx, user)
-	json.NewEncoder(response).Encode(result)
+	
 	fmt.Println(result)  // remove in production
+		
+	json.NewEncoder(response).Encode(result)
 }
 
 // Returns a list of all users
 func GetUsersEndpoint(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
-	fmt.Println(response)	// remove in production
+	fmt.Println("Get all users GET request received.")  // remove in production
 	var users []User
 	collection := client.Database("hackathon_app").Collection("users")
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
@@ -119,6 +120,7 @@ func GetUsersEndpoint(response http.ResponseWriter, request *http.Request) {
 // Return user where email matches user[email]
 func GetUserEndpoint(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
+	fmt.Println("Get single user GET request received.")  // remove in production
 	params := mux.Vars(request)
 	email, _ := params["email"]
 	fmt.Println(params)	// remove in production

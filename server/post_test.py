@@ -4,14 +4,35 @@ import json
 
 url = "http://localhost:5005/user"
 
-data = {
-    'firstname': 'Alice',
-    'lastname': 'Green',
-    'email': 'agreen@gmail.com',
-    'password': 'password'}
+data = [
+    {
+        'email': 'steve@gmail.com',
+        'firstname': 'Steve',
+        'lastname': 'Smith',
+        'password': 'Password',
+        'picker': 'true',
+        'packer': 'true',
+        'fb': '/ssmith_fb_url',
+        'insta': '/ssmith_fb_url',
+        'saveditems': [6, 8],
+        'listings': [4, 5, 6]
+    },
+    {
+        'email': 'alice@gmail.com',
+        'firstname': 'Alice',
+        'lastname': 'Green',
+        'password': 'password123',
+        'picker': 'false',
+        'packer': 'true',
+        'fb': '/agreen_fb_url',
+        'insta': '/agreen_fb_url',
+        'saveditems': [6, 8],
+        'listings': [4, 5, 6]
+    }]
 
-headers = {'Content-type': 'application/json'}
+headers = {'content-type': 'application/json'}
 
-r = requests.post(url, data=json.dumps(data), headers=headers)
+for i in data:
+    r = requests.post(url, data=json.dumps(i), headers=headers)
 
 print(r.text)

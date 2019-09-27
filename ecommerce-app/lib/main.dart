@@ -21,6 +21,12 @@
 // State management 101
 // https://flutter.dev/docs/development/data-and-backend/state-mgmt/intro
 
+// App routing 101
+// https://flutter.dev/docs/development/ui/navigation
+
+// Widget components 101
+// https://flutter.dev/docs/development/ui/widgets
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';

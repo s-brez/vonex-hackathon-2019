@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"github.com/gorilla/mux"
 	"context"
+	"reflect"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -30,13 +31,14 @@ type User struct {
 	Listings  	[]string       		`json:"listings,omitempty" bson:"listings,omitempty"`
 }
 
-// Item object - use name field as the unique key
+// Item object - use name field as the unique key. Note Image field is a base64 string of the image
 type Item struct {
 	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
 	Uid			string 				`json:"uid,omitempty" bson:"uid,omitempty"`
 	Name 		string           	`json:"name,omitempty" bson:"name,omitempty"`
 	Description string          	`json:"description,omitempty" bson:"description,omitempty"`
 	Category	string           	`json:"category,omitempty" bson:"category,omitempty"`
+	Image 		string 				`json:"image,omitempty" bson:"image,omitempty"`
 }
 
 // Listing object - use listing ID (lid) as unique key
@@ -47,6 +49,13 @@ type Listing struct {
 	Active		string 				`json:"active,omitempty" bson:"active,omitempty"`
 	Successful	string 				`json:"successful,omitempty" bson:"successful,omitempty"`
 	Item  		*Item 				`json:"item,omitempty" bson:"item,omitempty"`
+	Offers		[]Offer            `json:"offers,omitempty" bson:"offers,omitempty"`
+}
+
+// Offer object - intended to be nested in Listing
+type Offer struct {
+	Useremail	string 				`json:"usermail,omitempty" bson:"usermail,omitempty"`
+	Price		string 				`json:"price,omitempty" bson:"price,omitempty"`
 }
 
 // Message object - use message ID as unique key
@@ -58,9 +67,41 @@ type Message struct {
 	Text	  	string 			 	`json:"text,omitempty" bson:"text,omitempty"`	
 }
 
+// Deletion request json
+type Delete struct {
+	Uid 		string              `json:"uid"`
+}
 
 // Permanenty remove an item from database.
-func DeleteItemEndpoint(response http.ResponseWriter, request *http.Request) {}
+func DeleteItemEndpoint(response http.ResponseWriter, request *http.Request) {
+	fmt.Println("Delete item POST request received.")  // remove in production
+	response.Header().Set("content-type", "application/json")
+	
+	var del Delete
+	_ = json.NewDecoder(request.Body).Decode(&del)
+	uid := del.Uid
+	
+	var item Item
+	collection := client.Database("hackathon_app").Collection("items")
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	err := collection.FindOne(ctx, Item{Uid: uid}).Decode(&item)
+	
+	fmt.Println(item.ID)	// remove in production
+	res, err := collection.DeleteOne(ctx, bson.M{"_id": item.ID})
+	fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
+	if res.DeletedCount == 0 {
+		fmt.Println("DeleteOne() document not found:", res)
+	} else {
+		fmt.Println("DeleteOne Result:", res)
+		fmt.Println("DeleteOne TYPE:", reflect.TypeOf(res))
+	}
+	if err != nil {
+		response.WriteHeader(http.StatusInternalServerError)
+		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+		return
+	}
+	json.NewEncoder(response).Encode(item)
+}
 
 
 // Get all Items.
@@ -197,5 +238,6 @@ func main() {
 	router.HandleFunc("/item", CreateItemEndpoint).Methods("POST")
 	router.HandleFunc("/items", GetAllItemsEndpoint).Methods("GET")
 	router.HandleFunc("/item/{uid}", GetItemEndpoint).Methods("GET")
+	router.HandleFunc("/deleteitem", DeleteItemEndpoint).Methods("POST")
 	http.ListenAndServe(":5005", router)
 }

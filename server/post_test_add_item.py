@@ -1,8 +1,6 @@
 import requests
-import base64
 import json
 import time
-
 
 url = "http://localhost:5005/item"
 

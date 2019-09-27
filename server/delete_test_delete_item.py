@@ -6,10 +6,10 @@ import time
 
 url = "http://localhost:5005/deleteitem"
 
-data = {'uid': "h1"}
+data = {'uid': "a1"}
 
 headers = {'content-type': 'application/json'}
 
-r = requests.post(url, data=json.dumps(data), headers=headers)
+r = requests.delete(url, data=json.dumps(data), headers=headers)
 
 print(r.text)

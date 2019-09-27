@@ -14,8 +14,8 @@ data = [
         'packer': 'true',
         'fb': '/ssmith_fb_url',
         'insta': '/ssmith_fb_url',
-        'saveditems': [6, 8],
-        'listings': [4, 5, 6]
+        'saveditems': ["h1", "a1"],
+        'listings': ["l4", "l5", "l6"]
     },
     {
         'email': 'alice@gmail.com',
@@ -26,8 +26,8 @@ data = [
         'packer': 'true',
         'fb': '/agreen_fb_url',
         'insta': '/agreen_fb_url',
-        'saveditems': [6, 8],
-        'listings': [4, 5, 6]
+        'saveditems': ["f1", "b1"],
+        'listings': ["l1", "l2", "l3"]
     }]
 
 headers = {'content-type': 'application/json'}

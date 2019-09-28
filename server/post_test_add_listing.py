@@ -12,7 +12,7 @@ data = [
         'location': '12 Abbotsford St Richmond VIC 3121',
         'active': 'true',
         'successful': 'false',
-        'offers': [{'useremail': 'alice@gmail.com', 'price': '$120.00'}]
+        'offers': ['alice@gmail.com,$120.00', 'alice@gmail.com,swap']
     },
     {
         'uid': "l2",
@@ -21,7 +21,7 @@ data = [
         'location': '23 Bourke St Melbourne VIC 3000',
         'active': 'true',
         'successful': 'false',
-        'offers': [{'useremail': 'steve@gmail.com', 'price': '$200.00'}]
+        'offers': ['steve@gmail.com,$200.00', 'steve@gmail.com,swap']
     },
     {
         'uid': "l3",
@@ -30,7 +30,7 @@ data = [
         'location': '12 Abbotsford St Richmond VIC 3121',
         'active': 'true',
         'successful': 'false',
-        'offers': [{'useremail': 'alice@gmail.com', 'price': '$60.00'}]
+        'offers': ['alice@gmail.com,$60.00', 'alice@gmail.com,swap']
     },
     {
         'uid': "l4",
@@ -39,7 +39,7 @@ data = [
         'location': '23 Bourke St Melbourne VIC 3000',
         'active': 'true',
         'successful': 'false',
-        'offers': [{'useremail': 'steve@gmail.com', 'price': '$150.00'}]
+        'offers': ['steve@gmail.com,$150.00', 'steve@gmail.com,swap']
     },
     {
         'uid': "l5",
@@ -48,7 +48,7 @@ data = [
         'location': '12 Abbotsford St Richmond VIC 3121',
         'active': 'true',
         'successful': 'false',
-        'offers': [{'useremail': 'alice@gmail.com', 'price': '$75.00'}]
+        'offers': ['alice@gmail.com,$75.00', 'steve@gmail.com,swap']
     },
     {
         'uid': "l6",
@@ -57,7 +57,7 @@ data = [
         'location': '23 Bourke St Melbourne VIC 3000',
         'active': 'true',
         'successful': 'false',
-        'offers': [{'useremail': 'steve@gmail.com', 'price': '$37.50'}]
+        'offers': ['steve@gmail.com,$37.50', 'steve@gmail.com,swap']
     }]
 
 headers = {'content-type': 'application/json'}

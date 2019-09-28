@@ -23,11 +23,17 @@ type User struct {
 	Firstname 	string             	`json:"firstname,omitempty" bson:"firstname,omitempty"`
 	Lastname  	string             	`json:"lastname,omitempty" bson:"lastname,omitempty"`
 	Password  	string             	`json:"password,omitempty" bson:"password,omitempty"`
-	Picker	  	string             	`json:"picker,omitempty" bson:"picker,omitempty"`
-	Packer	  	string             	`json:"packer,omitempty" bson:"packer,omitempty"`
 	Fb			string 				`json:"fb,omitempty" bson:"fb,omitempty"`
 	Insta 		string 				`json:"insta,omitempty" bson:"insta,omitempty"`
+
+	// Flags to show if a user is looking to primarily sell/give items, or buy/take items
+	Picker	  	string             	`json:"picker,omitempty" bson:"picker,omitempty"`
+	Packer	  	string             	`json:"packer,omitempty" bson:"packer,omitempty"`
+	
+	// Each string should correspond to an items Uid
 	Saveditems  []string       	 	`json:"saveditems,omitempty" bson:"saveditems,omitempty"`
+	
+	// Each string should correspond to a listings Uid
 	Listings  	[]string       		`json:"listings,omitempty" bson:"listings,omitempty"`
 }
 
@@ -44,19 +50,30 @@ type Item struct {
 // Listing object - use listing ID (lid) as unique key
 type Listing struct {
 	ID        	primitive.ObjectID 	`json:"_id,omitempty" bson:"_id,omitempty"`
-	Uid		  	string 			 	`json:"uid,string,omitempty" bson:"uid,string,omitempty"`
+	
+	// Use lowercase 'L' + incrementing integer for listing Uid's
+	Uid		  	string 			 	`json:"uid,omitempty" bson:"uid,omitempty"`
+	
+	// The Uid of the item featured in this listings
 	Itemid  	string 				`json:"itemid,omitempty" bson:"itemid,omitempty"`
-	Useremail  	string 				`json:"useremail,omitempty" bson:"useremail,omitempty"`
+	
+	// Email of the user posting the listing 	
+	Useremail	string             	`json:"useremail,omitempty" bson:"useremail,omitempty"`
+	
 	Location 	string 			 	`json:"location,omitempty" bson:"location,omitempty"`
+	
+	// If or not listing is visible to others.
 	Active		string 				`json:"active,omitempty" bson:"active,omitempty"`
+	
+	// If or not the listing has been completed
 	Successful	string 				`json:"successful,omitempty" bson:"successful,omitempty"`
-	Offers		[]Offer             `json:"offers,omitempty" bson:"offers,omitempty"`
-}
-
-// Offer object - intended to be nested in Listing
-type Offer struct {
-	Useremail	string 				`json:"useremail,omitempty" bson:"useremail,omitempty"`
-	Price		string 				`json:"price,omitempty" bson:"price,omitempty"`
+	
+	// Indicates is listing is a swap, sell, or giveaway
+	Type 		string 				`json:"type,omitempty" bson:"type,omitempty"`
+	
+	// format: ["email,offer_type", ...]
+	// Split each string into two by comma delimiter to get the offerer and offer type)
+	Offers		[]string            `json:"offers,omitempty" bson:"offers,omitempty"`
 }
 
 // Message object
@@ -76,8 +93,7 @@ type Delete struct {
 // Modify request json:struct for ModifyListingEndpoint
 type ModifyListing struct {
 	Uid 		string              `json:"uid"`
-	Listings  	[]string       		`json:"listings,omitempty" bson:"listings,omitempty"`
-
+	Offers  	[]string       		`json:"offers,omitempty" bson:"offers,omitempty"`
 }
 
 // Modify request json:struct for ModifyuserEndpoint
@@ -300,13 +316,105 @@ func GetListingEndpoint(response http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(response).Encode(listing)
 }
 
-func ModifyListingEndpoint(response http.ResponseWriter, request *http.Request) {}
+// Write a new message object to database
+func CreateMessageEndpoint(response http.ResponseWriter, request *http.Request) {
+	fmt.Println("Create message POST request received.")  // remove in production
+	response.Header().Set("content-type", "application/json")
+	var message Message
+	_ = json.NewDecoder(request.Body).Decode(&message)
+	fmt.Println(message)	// remove in production
+	collection := client.Database("hackathon_app").Collection("messages")
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	result, _ := collection.InsertOne(ctx, message)
+	fmt.Println(result)  // remove in production
+	json.NewEncoder(response).Encode(result)
+}
 
-func CreateMessageEndpoint(response http.ResponseWriter, request *http.Request) {}
+// Return all messages
+func GetMessagesEndpoint(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set("content-type", "application/json")
+	fmt.Println("Get all messages GET request received.")  // remove in production
+	var messages []Message
+	collection := client.Database("hackathon_app").Collection("messages")
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		response.WriteHeader(http.StatusInternalServerError)
+		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+		return
+	}
+	defer cursor.Close(ctx)
+	for cursor.Next(ctx) {
+		var message Message
+		cursor.Decode(&message)
+		messages = append(messages, message)
+	}
+	if err := cursor.Err(); err != nil {
+		response.WriteHeader(http.StatusInternalServerError)
+		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+		return
+	}
+	json.NewEncoder(response).Encode(messages)
+}
 
-func GetMessagesEndpoint(response http.ResponseWriter, request *http.Request) {}
+func ModifyListingEndpoint(response http.ResponseWriter, request *http.Request) {
+	fmt.Println("Modify listing PUT request received.")  // remove in production
+	response.Header().Set("content-type", "application/json")
+	
+	var modlist ModifyListing
+	_ = json.NewDecoder(request.Body).Decode(&modlist)
+	uid := modlist.Uid
+	offers := modlist.Offers
+	
+	var listing Listing
+	collection := client.Database("hackathon_app").Collection("listings")
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	err := collection.FindOne(ctx, Listing{Uid: uid}).Decode(&modlist)
+	
+	fmt.Println(item.ID)	// remove in production
+	
+	// now we found the id hash, update offers field with given data
 
-func ModifyUserEndpoint(response http.ResponseWriter, request *http.Request) {}
+	// res, err := collection.DeleteOne(ctx, bson.M{"_id": modlist.ID})
+	// fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
+
+	// if err != nil {
+	// 	response.WriteHeader(http.StatusInternalServerError)
+	// 	response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+	// 	return
+	// }
+	// json.NewEncoder(response).Encode(item)
+}
+
+func ModifyUserEndpoint(response http.ResponseWriter, request *http.Request) {
+	fmt.Println("Modify user PUT request received.")  // remove in production
+	response.Header().Set("content-type", "application/json")
+	
+	var moduser ModifyUser
+	_ = json.NewDecoder(request.Body).Decode(&moduser)
+	email := modusert.Email
+	saveditems := moduser.Saveditems
+	listings := moduser.Listings
+	
+	var user User
+	collection := client.Database("hackathon_app").Collection("users")
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	err := collection.FindOne(ctx, User{Email: email}).Decode(&moduser)
+	
+	fmt.Println(item.ID)	// remove in production
+	
+	// now we found the id hash, update listings and saveditems with given data
+
+	// res, err := collection.DeleteOne(ctx, bson.M{"_id": modlist.ID})
+	// fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
+
+	// if err != nil {
+	// 	response.WriteHeader(http.StatusInternalServerError)
+	// 	response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+	// 	return
+	// }
+	// json.NewEncoder(response).Encode(item)
+}
 
 func main() {
 	fmt.Println("Vonex Hackathon App Server - Up-Cycling App")
@@ -339,7 +447,8 @@ func main() {
 
 	// Message endpoints
 	router.HandleFunc("/message", CreateMessageEndpoint).Methods("POST")
-	router.HandleFunc("/messages/{email}", GetMessagesEndpoint).Methods("GET")
+	router.HandleFunc("/messages", GetMessagesEndpoint).Methods("GET")
+	router.HandleFunc("/message/{email}", GetMessagesBySenderEndpoint).Methods("GET")
 
 	// Port to serve
 	http.ListenAndServe(":5005", router)

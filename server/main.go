@@ -29,12 +29,14 @@ type User struct {
 	// Flags to show if a user is looking to primarily sell/give items, or buy/take items
 	Picker	  	string             	`json:"picker,omitempty" bson:"picker,omitempty"`
 	Packer	  	string             	`json:"packer,omitempty" bson:"packer,omitempty"`
+	Rating 		string 				`json:"rating,omitempty" bson:"rating,omitempty"`
 	
 	// Each string should correspond to an items Uid
 	Saveditems  []string       	 	`json:"saveditems,omitempty" bson:"saveditems,omitempty"`
 	
 	// Each string should correspond to a listings Uid
 	Listings  	[]string       		`json:"listings,omitempty" bson:"listings,omitempty"`
+
 }
 
 // Item object - use name field as the unique key. Note Image field is a base64 string of the image
@@ -101,6 +103,7 @@ type ModifyUser struct {
 	Email	  	string             	`json:"email`
 	Saveditems  []string       	 	`json:"saveditems,omitempty" bson:"saveditems,omitempty"`
 	Listings  	[]string       		`json:"listings,omitempty" bson:"listings,omitempty"`
+	Rating 		string 				`json:"rating,omitempty" bson:"rating,omitempty"`
 }
 
 // Permanenty remove an item from database.
@@ -358,62 +361,63 @@ func GetMessagesEndpoint(response http.ResponseWriter, request *http.Request) {
 }
 
 func ModifyListingEndpoint(response http.ResponseWriter, request *http.Request) {
-	fmt.Println("Modify listing PUT request received.")  // remove in production
-	response.Header().Set("content-type", "application/json")
+	// fmt.Println("Modify listing PUT request received.")  // remove in production
+	// response.Header().Set("content-type", "application/json")
 	
-	var modlist ModifyListing
-	_ = json.NewDecoder(request.Body).Decode(&modlist)
-	uid := modlist.Uid
-	offers := modlist.Offers
+	// var modlist ModifyListing
+	// _ = json.NewDecoder(request.Body).Decode(&modlist)
+	// uid := modlist.Uid
+	// offers := modlist.Offers
 	
-	var listing Listing
-	collection := client.Database("hackathon_app").Collection("listings")
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	err := collection.FindOne(ctx, Listing{Uid: uid}).Decode(&modlist)
+	// var listing Listing
+	// collection := client.Database("hackathon_app").Collection("listings")
+	// ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	// err := collection.FindOne(ctx, Listing{Uid: uid}).Decode(&modlist)
 	
-	fmt.Println(item.ID)	// remove in production
+	// fmt.Println(listing.ID)	// remove in production
 	
-	// now we found the id hash, update offers field with given data
+	// // now we found the id hash, update offers field with given data
 
-	// res, err := collection.DeleteOne(ctx, bson.M{"_id": modlist.ID})
-	// fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
+	// // res, err := collection.DeleteOne(ctx, bson.M{"_id": modlist.ID})
+	// // fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
 
-	// if err != nil {
-	// 	response.WriteHeader(http.StatusInternalServerError)
-	// 	response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
-	// 	return
-	// }
-	// json.NewEncoder(response).Encode(item)
+	// // if err != nil {
+	// // 	response.WriteHeader(http.StatusInternalServerError)
+	// // 	response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+	// // 	return
+	// // }
+	// // json.NewEncoder(response).Encode(item)
 }
 
 func ModifyUserEndpoint(response http.ResponseWriter, request *http.Request) {
-	fmt.Println("Modify user PUT request received.")  // remove in production
-	response.Header().Set("content-type", "application/json")
+	// fmt.Println("Modify user PUT request received.")  // remove in production
+	// response.Header().Set("content-type", "application/json")
 	
-	var moduser ModifyUser
-	_ = json.NewDecoder(request.Body).Decode(&moduser)
-	email := modusert.Email
-	saveditems := moduser.Saveditems
-	listings := moduser.Listings
+	// var moduser ModifyUser
+	// _ = json.NewDecoder(request.Body).Decode(&moduser)
+	// email := moduser.Email
+	// saveditems := moduser.Saveditems
+	// listings := moduser.Listings
+	// rating := moduser.Rating
 	
-	var user User
-	collection := client.Database("hackathon_app").Collection("users")
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	err := collection.FindOne(ctx, User{Email: email}).Decode(&moduser)
+	// var user User
+	// collection := client.Database("hackathon_app").Collection("users")
+	// ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	// err := collection.FindOne(ctx, User{Email: email}).Decode(&moduser)
 	
-	fmt.Println(item.ID)	// remove in production
+	// fmt.Println(user.ID)	// remove in production
 	
-	// now we found the id hash, update listings and saveditems with given data
+	// // now we found the id hash, update listings and saveditems with given data
 
-	// res, err := collection.DeleteOne(ctx, bson.M{"_id": modlist.ID})
-	// fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
+	// // res, err := collection.DeleteOne(ctx, bson.M{"_id": modlist.ID})
+	// // fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
 
-	// if err != nil {
-	// 	response.WriteHeader(http.StatusInternalServerError)
-	// 	response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
-	// 	return
-	// }
-	// json.NewEncoder(response).Encode(item)
+	// // if err != nil {
+	// // 	response.WriteHeader(http.StatusInternalServerError)
+	// // 	response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+	// // 	return
+	// // }
+	// // json.NewEncoder(response).Encode(item)
 }
 
 func main() {
@@ -448,7 +452,6 @@ func main() {
 	// Message endpoints
 	router.HandleFunc("/message", CreateMessageEndpoint).Methods("POST")
 	router.HandleFunc("/messages", GetMessagesEndpoint).Methods("GET")
-	router.HandleFunc("/message/{email}", GetMessagesBySenderEndpoint).Methods("GET")
 
 	// Port to serve
 	http.ListenAndServe(":5005", router)

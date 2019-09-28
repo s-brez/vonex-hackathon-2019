@@ -15,7 +15,8 @@ data = [
         'fb': '/ssmith_fb_url',
         'insta': '/ssmith_fb_url',
         'saveditems': ["h1", "a1"],
-        'listings': ["l4", "l5", "l6"]
+        'listings': ["l4", "l5", "l6"],
+        'rating': '5'
     },
     {
         'email': 'alice@gmail.com',
@@ -27,7 +28,8 @@ data = [
         'fb': '/agreen_fb_url',
         'insta': '/agreen_fb_url',
         'saveditems': ["f1", "b1"],
-        'listings': ["l1", "l2", "l3"]
+        'listings': ["l1", "l2", "l3"],
+        'rating': '5'
     }]
 
 headers = {'content-type': 'application/json'}

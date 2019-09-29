@@ -33,7 +33,9 @@ dev_dependencies:
   pedantic: ^1.8.0
 
 flutter:
+  uses-material-design: true
   assets:
+    - assets/logo.png
     - packages/shrine_images/0-0.jpg
     - packages/shrine_images/1-0.jpg
     - packages/shrine_images/2-0.jpg

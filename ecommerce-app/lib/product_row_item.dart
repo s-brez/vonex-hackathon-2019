@@ -80,8 +80,20 @@ class ProductRowItem extends StatelessWidget {
               model.addProductToCart(product.id);
             },
             child: const Icon(
-              CupertinoIcons.plus_circled,
-              semanticLabel: 'Add',
+              CupertinoIcons.heart,       //plus_circled,
+              semanticLabel: 'Like',
+            ),
+          ),
+
+          CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              final model = Provider.of<AppStateModel>(context);
+              model.addProductToCart(product.id);
+            },
+            child: const Icon(
+              CupertinoIcons.plus_circled,       //plus_circled,
+              semanticLabel: 'Add to cart',
             ),
           ),
         ],

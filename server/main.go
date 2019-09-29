@@ -460,7 +460,7 @@ func main() {
 
 	// MongoDB context and client 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI("mongodb+srv://sam:sam@cluster0-leouu.mongodb.net/test?retryWrites=true&w=majority")
 	client, _ = mongo.Connect(ctx, clientOptions)
 	
 	// Request router

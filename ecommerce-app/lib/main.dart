@@ -1,18 +1,3 @@
-// Copyright 2019 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 // Another template for listing products
 // Card listings: https://codelabs.developers.google.com/codelabs/mdc-102-flutter/#5
 // How to make the app super pretty: https://codelabs.developers.google.com/codelabs/mdc-103-flutter/#0
@@ -31,8 +16,48 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'app.dart';
+import 'package:flutter/material.dart';
+
+import 'login.dart';
+import 'cupertinoStore.dart';
 import 'model/app_state_model.dart';
+
+// TODO: Convert ShrineApp to stateful widget (104)
+class ShrineApp extends StatelessWidget {
+  
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Up-Cycle',
+      // TODO: Change home: to a Backdrop with a HomePage frontLayer (104)
+      home: CupertinoStoreHomePage(),
+      // TODO: Make currentCategory field take _currentCategory (104)
+      // TODO: Pass _currentCategory for frontLayer (104)
+      // TODO: Change backLayer field value to CategoryMenuPage (104)
+      initialRoute: '/login',
+      onGenerateRoute: _getRoute,
+      // TODO: Add a theme (103)
+    );
+  }
+
+  Route<dynamic> _getRoute(RouteSettings settings) {
+    if (settings.name != '/login') {
+      return null;
+    }
+
+    return MaterialPageRoute<void>(
+      settings: settings,
+      builder: (BuildContext context) => LoginPage(),
+      fullscreenDialog: true,
+    );
+  }
+}
+
+// TODO: Build a Shrine Theme (103)
+// TODO: Build a Shrine Text Theme (103)
+
+
+
 
 void main() {
   // This app is designed only to work vertically, so we limit
@@ -43,7 +68,7 @@ void main() {
   return runApp(
     ChangeNotifierProvider<AppStateModel>(
       builder: (context) => AppStateModel()..loadProducts(),
-      child: CupertinoStoreApp(),
+      child: ShrineApp(),
     ),
   );
 }

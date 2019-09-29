@@ -59,6 +59,15 @@
 // }
 
 
+import 'userApiCalls.dart';
 
+final String email = "steve@gmail.com";
 
+void main(){
+
+  Future<User> futureMainUser = fetchUser(email, setAsMainUser : true).then(mainUser.updatePassword("abc123"));
+
+  
+
+}
 

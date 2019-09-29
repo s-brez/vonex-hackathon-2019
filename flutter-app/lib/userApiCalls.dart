@@ -148,8 +148,16 @@ class User {
   }
 }
 
+final String email = "steve@gmail.com";
 
+void main(){
 
+  Future<User> futureMainUser = fetchUser(email, setAsMainUser : true).then(mainUser.updatePassword("abc123"));
+  
+
+  
+
+}
 // void main() => runApp(MyApp(user: fetchUser(email)));
 
 // class MyApp extends StatelessWidget {

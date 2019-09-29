@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
 export "FLUTTER_ROOT=C:\flutter_windows_v1.9.1+hotfix.2-stable\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\Users\uyenn\Google Drive\Go server\vonex-hackathon-2019\flutter-app"
+export "FLUTTER_APPLICATION_PATH=C:\Users\uyenn\Google Drive\Go server\flutter-startup-namer"
 export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "SYMROOT=${SOURCE_ROOT}/../build\ios"

@@ -1,0 +1,4 @@
+#Sun Sep 29 01:51:47 AEST 2019
+base.0=D\:\\vonex-hackathon-2019\\ui-streamline\\build\\app\\intermediates\\transforms\\dexMerger\\debug\\0
+path.0=classes.dex
+renamed.0=classes.dex

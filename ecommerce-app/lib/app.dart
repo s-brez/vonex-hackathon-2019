@@ -1,21 +1,8 @@
-// Copyright 2019 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
+import 'package:cupertino_store/wishlist_tab.dart';
 import 'package:flutter/cupertino.dart';
 import 'product_list_tab.dart';
 import 'search_tab.dart';
-import 'shopping_cart_tab.dart';
+import 'wishlist_tab.dart';
 
 class CupertinoStoreApp extends StatelessWidget {
   @override
@@ -41,11 +28,12 @@ class CupertinoStoreHomePage extends StatelessWidget {
             title: Text('Search'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.shopping_cart),
-            title: Text('Cart'),
+            icon: Icon(CupertinoIcons.bookmark),
+            title: Text('Wishlist'),
           ),
         ],
       ),
+
       tabBuilder: (context, index) {
         CupertinoTabView returnValue;
         switch (index) {
@@ -66,7 +54,7 @@ class CupertinoStoreHomePage extends StatelessWidget {
           case 2:
             returnValue = CupertinoTabView(builder: (context) {
               return CupertinoPageScaffold(
-                child: ShoppingCartTab(),
+                child: WishListTab(),
               );
             });
             break;

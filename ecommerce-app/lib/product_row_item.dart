@@ -80,7 +80,7 @@ class ProductRowItem extends StatelessWidget {
               model.addProductToCart(product.id);
             },
             child: const Icon(
-              CupertinoIcons.plus_circled,
+              CupertinoIcons.heart,
               semanticLabel: 'Add',
             ),
           ),

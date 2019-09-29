@@ -96,6 +96,8 @@ type Delete struct {
 type ModifyListing struct {
 	Uid 		string              `json:"uid"`
 	Offers  	[]string       		`json:"offers,omitempty" bson:"offers,omitempty"`
+	Active		string 				`json:"active,omitempty" bson:"active,omitempty"`	
+	Successful	string 				`json:"successful,omitempty" bson:"successful,omitempty"`
 }
 
 // Modify request json:struct for ModifyuserEndpoint
@@ -361,32 +363,49 @@ func GetMessagesEndpoint(response http.ResponseWriter, request *http.Request) {
 }
 
 func ModifyListingEndpoint(response http.ResponseWriter, request *http.Request) {
-	// fmt.Println("Modify listing PUT request received.")  // remove in production
-	// response.Header().Set("content-type", "application/json")
+	fmt.Println("Modify item PUT request received.")  // remove in production
+	response.Header().Set("content-type", "application/json")
 	
-	// var modlist ModifyListing
-	// _ = json.NewDecoder(request.Body).Decode(&modlist)
-	// uid := modlist.Uid
-	// offers := modlist.Offers
+	// Copy PUT JSON data to ModifyListing struct object
+	var mod ModifyListing
+	_ = json.NewDecoder(request.Body).Decode(&mod)
+	uid := mod.Uid
+	offers := mod.Offers
+	active := mod.Active
+	successful := mod.Successful
 	
-	// var listing Listing
-	// collection := client.Database("hackathon_app").Collection("listings")
-	// ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	// err := collection.FindOne(ctx, Listing{Uid: uid}).Decode(&modlist)
+	// Create a local copy of the stored listing
+	var listing Listing
+	collection := client.Database("hackathon_app").Collection("listings")
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	err := collection.FindOne(ctx, Listing{Uid: uid}).Decode(&listing)
 	
-	// fmt.Println(listing.ID)	// remove in production
-	
-	// // now we found the id hash, update offers field with given data
+	// Delete the original listing in DB
+	res, err := collection.DeleteOne(ctx, bson.M{"_id": listing.ID})
+	fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
+	if res.DeletedCount == 0 {
+		fmt.Println("Document not found:", res)
+	} else {
+		fmt.Println("Deleted:", res)
+	}
+	if err != nil {
+		response.WriteHeader(http.StatusInternalServerError)
+		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+		return
+	}
 
-	// // res, err := collection.DeleteOne(ctx, bson.M{"_id": modlist.ID})
-	// // fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
+	// Change the local Listing copy to include the new Offers data
+	fmt.Println("New data", offers, active, successful)
+	listing.Offers = offers
+	listing.Active = active
+	listing.Successful = successful
+	fmt.Println("Amended data", listing.Offers, listing.Active, listing.Successful)
 
-	// // if err != nil {
-	// // 	response.WriteHeader(http.StatusInternalServerError)
-	// // 	response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
-	// // 	return
-	// // }
-	// // json.NewEncoder(response).Encode(item)
+	// Insert the updated listing in DB
+	collection = client.Database("hackathon_app").Collection("listings")
+	ctx, _ = context.WithTimeout(context.Background(), 5*time.Second)
+	result, _ := collection.InsertOne(ctx, listing)
+	json.NewEncoder(response).Encode(result)
 }
 
 func ModifyUserEndpoint(response http.ResponseWriter, request *http.Request) {

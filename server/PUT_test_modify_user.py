@@ -4,13 +4,13 @@ import json
 import time
 
 
-url = "http://localhost:5005/modifylisting"
+url = "http://localhost:5005/modifyuser"
 
 data = {
-    'uid': "l1",
-    'offers': ["testmodifyoffer,$120.0", "testmodifyoffer.com,swap"],
-    'active': "false",
-    'successful': 'true'
+    'email': "alice@gmail.com",
+    'saveditems': ["modtest", "a1"],
+    'listings': ["modtest", "l5", "l6"],
+    'rating': '9999'
     }
 
 headers = {'content-type': 'application/json'}

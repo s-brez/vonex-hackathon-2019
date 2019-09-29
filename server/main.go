@@ -409,34 +409,50 @@ func ModifyListingEndpoint(response http.ResponseWriter, request *http.Request) 
 }
 
 func ModifyUserEndpoint(response http.ResponseWriter, request *http.Request) {
-	// fmt.Println("Modify user PUT request received.")  // remove in production
-	// response.Header().Set("content-type", "application/json")
+	fmt.Println("Modify user PUT request received.")
+	response.Header().Set("content-type", "application/json")
 	
-	// var moduser ModifyUser
-	// _ = json.NewDecoder(request.Body).Decode(&moduser)
-	// email := moduser.Email
-	// saveditems := moduser.Saveditems
-	// listings := moduser.Listings
-	// rating := moduser.Rating
-	
-	// var user User
-	// collection := client.Database("hackathon_app").Collection("users")
-	// ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	// err := collection.FindOne(ctx, User{Email: email}).Decode(&moduser)
-	
-	// fmt.Println(user.ID)	// remove in production
-	
-	// // now we found the id hash, update listings and saveditems with given data
+	// Copy PUT JSON data to ModifyListing struct object
+	var mod ModifyUser
+	_ = json.NewDecoder(request.Body).Decode(&mod)
+	email := mod.Email
+	saveditems := mod.Saveditems
+	listings := mod.Listings
+	rating := mod.Rating
 
-	// // res, err := collection.DeleteOne(ctx, bson.M{"_id": modlist.ID})
-	// // fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
+	// Create a local copy of the stored user
+	var user User
+	collection := client.Database("hackathon_app").Collection("users")
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	err := collection.FindOne(ctx, User{Email: email}).Decode(&user)
+	
+	// Delete the original user in DB
+	res, err := collection.DeleteOne(ctx, bson.M{"_id": user.ID})
+	fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
+	if res.DeletedCount == 0 {
+		fmt.Println("Document not found:", res)
+	} else {
+		fmt.Println("Deleted:", res)
+	}
+	if err != nil {
+		response.WriteHeader(http.StatusInternalServerError)
+		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+		return
+	}
 
-	// // if err != nil {
-	// // 	response.WriteHeader(http.StatusInternalServerError)
-	// // 	response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
-	// // 	return
-	// // }
-	// // json.NewEncoder(response).Encode(item)
+	// Change the local Listing copy to include the new Offers data
+	fmt.Println("New data", saveditems, listings, rating)
+	user.Saveditems = saveditems
+	user.Listings = listings
+	user.Rating = rating
+	fmt.Println("Amended data", user.Saveditems, user.Listings, user.Rating)
+
+	// Insert the updated listing in DB
+	collection = client.Database("hackathon_app").Collection("users")
+	ctx, _ = context.WithTimeout(context.Background(), 5*time.Second)
+	result, _ := collection.InsertOne(ctx, user)
+	json.NewEncoder(response).Encode(result)
+
 }
 
 func main() {
